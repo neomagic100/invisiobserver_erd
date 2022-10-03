@@ -1,9 +1,5 @@
 project invisiobserver {
   database_type: 'mariadb'
-  Note: '''
-    # Database to manage user logins
-    ** markdown **
-  '''
 }
 
 Table users {
