@@ -1,0 +1,528 @@
+project invisiobserver {
+  database_type: 'mariadb'
+  Note: '''
+    # Database to manage Wireshark Data
+    ** markdown **
+  '''
+}
+
+Table capture {
+  id integer [pk, not null]
+  _index TEXT
+  _type TINYTEXT
+  _score TEXT
+}
+
+Table frame {
+  id integer [pk, ref: - capture.id]
+  interface_id integer
+  interface_name TEXT
+  interface_description TEXT
+  encap_type integer
+  time datetime
+  time_epoch double
+  time_delta double
+  time_delta_displayed double
+  time_relative double
+  number integer // id in capture
+  len integer
+  cap_len integer
+  marked integer
+  ignored integer
+  protocols TEXT
+  coloring_rule_name TINYTEXT
+  coloring_rule_string TINYTEXT
+}
+
+
+Table eth {
+  id integer [pk, ref: - capture.id]
+  dst VARCHAR(17) [ref: > eth_destination.dst_ip,
+  note: 'ff:ff:ff:ff:ff:ff']
+  src VARCHAR(17) [ref: > eth_source.src_ip,
+  note: 'ff:ff:ff:ff:ff:ff']
+  type INTEGER
+}
+
+Tablegroup eth_route {
+  eth_destination
+  eth_source
+}
+
+Table eth_destination {
+  dst_ip VARCHAR(17) [pk, 
+  note: 'ff:ff:ff:ff:ff:ff']
+  dst_dst_resolved TINYTEXT
+  dst_dst_oui integer
+  dst_addr VARCHAR(17) [ 
+  note: 'ff:ff:ff:ff:ff:ff']
+  dst_addr_resolved TINYTEXT
+  dst_dst_lg integer
+  dst_lg integer
+  dst_dst_ig integer
+  dst_ig integer
+}
+
+Table eth_source {
+  src_ip VARCHAR(17) [pk, 
+  note: 'ff:ff:ff:ff:ff:ff']
+  src_src_resolved TINYTEXT
+  src_src_oui integer
+  src_src_oui_resolved TINYTEXT
+  src_addr VARCHAR(17) [ 
+  note: 'ff:ff:ff:ff:ff:ff']
+  src_addr_resolved TEXT
+  src_addr_oui integer
+  src_addr_oui_resolved TEXT
+  src_src_lg integer
+  src_lg integer
+  src_src_ig integer
+  src_ig integer
+}
+
+Table ip {
+  id integer [pk, ref: - capture.id]
+  addr VARCHAR(15) [default: NULL]
+  bogus_header_length TEXT [default: NULL]
+  bogus_ip_length TEXT [default: NULL]
+  bogus_ip_version TEXT [default: NULL]
+  checksum "smallint unsigned" [default: 0]
+  checksum_status "tinyint unsigned" [default: 0]
+  checksum_bad tinyint(1) [default: 0]
+  checksum_bad_expert TEXT [default: NULL]
+  checksum_calculated "smallint unsigned" [default: 0]
+  checksum_good tinyint(1) [default: 0]
+  cipso_categories TEXT [default: NULL]
+  cipso_doi "integer unsigned" [default: 0]
+  cipso_malformed TEXT [default: NULL]
+  cipso_sensitivity_level "tinyint unsigned" [default: 0]
+  cipso_tag_data blob [default: NULL]
+  cipso_tag_type "tinyint unsigned" [default: 0]
+  cur_rt VARCHAR(15) [default: NULL]
+  cur_rt_host TEXT [default: NULL]
+  dsfield "tinyint unsigned" [default: NULL]
+  dsfield_ce "tinyint unsigned" [default: NULL]
+  dsfield_dscp "tinyint unsigned" [default: NULL]
+  dsfield_ecn "tinyint unsigned" [default: NULL]
+  dsfield_ect "tinyint unsigned" [default: NULL]
+  dst VARCHAR(15) [default: NULL]
+  dst_host VARCHAR(15) [default: NULL]
+  empty_rt VARCHAR(15) [default: NULL]
+  empty_rt_host TEXT [default: NULL]
+  evil_packet TEXT [default: NULL]
+  flags "tinyint unsigned" [default: 0]
+  flags_df tinyint(1) [default: 0]
+  flags_mf tinyint(1) [default: 0]
+  flags_rb tinyint(1) [default: 0]
+  flags_sf tinyint(1) [default: 0]
+  flags_offset "smallint unsigned" [default: 0]
+  fragment VARCHAR(15) [default: NULL]
+  geoip_asnum "integer unsigned" [default: 0]
+  geoip_city TEXT [default: NULL]
+  geoip_country TEXT [default: NULL]
+  geoip_country_iso TEXT [default: NULL]
+  geoip_dst_asnum "integer unsigned" [default: 0]
+  geoip_dst_city TEXT [default: NULL]
+  geoip_dst_country TEXT [default: NULL]
+  geoip_dst_country_iso TEXT [default: NULL]
+  geoip_dst_isp TEXT [default: NULL]
+  geoip_dst_lat double [default: 0]
+  geoip_dst_lon double [default: 0]
+  geoip_dst_org TEXT [default: NULL]
+  geoip_dst_summary TEXT [default: NULL]
+  geoip_isp TEXT [default: NULL]
+  geoip_lat double [default: 0]
+  geoip_lon double [default: 0]
+  geoip_org TEXT [default: NULL]
+  geoip_src_asnum "integer unsigned" [default: 0]
+  geoip_src_city TEXT [default: NULL]
+  geoip_src_country TEXT [default: NULL]
+  geoip_src_country_iso TEXT [default: NULL]
+  geoip_src_isp TEXT [default: NULL]
+  geoip_src_lat double [default: 0]
+  geoip_src_lon double [default: 0]
+  geoip_src_org TEXT [default: NULL]
+  geoip_org_summary TEXT [default: NULL]
+  hdr_len "tinyint unsigned" [default: 0]
+  host TEXT [default: NULL]
+  ip_id "smallint unsigned" [default: 0]
+  len "smallint unsigned" [default: 0]
+  nop TEXT [default: NULL]
+  opt_addr VARCHAR(15) [default: NULL]
+  opt_ext_sec_add_sec_info blob [default: NULL]
+  opt_ext_sec_add_sec_info_format_code "tinyint unsigned" [default: 0]
+  opt_flag "tinyint unsigned" [default: 0]
+  opt_id_num "smallint unsigned" [default: 0]
+  opt_len "tinyint unsigned" [default: 0]
+  opt_len_invalid TEXT [default: NULL]
+  opt_mtu "smallint unsigned" [default: 0]
+  opt_ohc "smallint unsigned" [default: 0]
+  opt_originator VARCHAR(15) [default: NULL]
+  opt_overflow "tinyint unsigned" [default: 0]
+  opt_padding blob [default: NULL]
+  opt_ptr "tinyint unsigned" [default: 0]
+  opt_ptr_before_addr TEXT [default: NULL]
+  opt_ptr_middle_addr TEXT [default: NULL]
+  opt_qs_func "tinyint unsigned" [default: 0]
+  opt_qs_nonce "integer unsigned" [default: 0]
+  opt_qs_rate "tinyint unsigned" [default: 0]
+  opt_qs_reserved "integer unsigned" [default: 0]
+  opt_qs_ttl "tinyint unsigned" [default: 0]
+  opt_qs_ttl_diff "tinyint unsigned" [default: 0]
+  opt_qs_unused "tinyint unsigned" [default: 0]
+  opt_ra "smallint unsigned" [default: 0]
+  opt_rhc "smallint unsigned" [default: 0]
+  opt_sec_cl "tinyint unsigned" [default: 0]
+  opt_sec_prot_auth_doe tinyint(1) [default: 0]
+  opt_sec_prot_auth_flags "tinyint unsigned" [default: 0]
+  opt_sec_prot_auth_fti tinyint(1) [default: 0]
+  opt_sec_prot_auth_genser tinyint(1) [default: 0]
+  opt_sec_prot_auth_nsa tinyint(1) [default: 0]
+  opt_sec_prot_auth_sci tinyint(1) [default: 0]
+  opt_sec_prot_auth_siop_esi tinyint(1) [default: 0]
+  opt_sec_prot_auth_unassigned "tinyint unsigned" [default: 0]
+  opt_sec_rfc791_comp "smallint unsigned" [default: 0]
+  opt_sec_rfc791_hr TEXT [default: NULL]
+  opt_sec_rfc791_sec "tinyint unsigned" [default: 0]
+  opt_sec_rfc791_ttc TEXT [default: NULL]
+  opt_sid "smallint unsigned" [default: 0]
+  opt_time_stamp "integer unsigned" [default: 0]
+  opt_time_stamp_addr VARCHAR(15) [default: NULL]
+  opt_type "tinyint unsigned" [default: 0]
+  opt_type_class "tinyint unsigned" [default: 0]
+  opt_type_copy tinyint(0) [default: 0]
+  opt_type_number "tinyint unsigned" [default: 0]
+  proto "tinyint unsigned" [default: 0]
+  reassembled_data blob [default: NULL]
+  reassembled_length "integer unsigned" [default: 0]
+  reassembled_in "integer unsigned" [default: 0, note: 'frame reference number']
+  rec_rt VARCHAR(15) [default: NULL]
+  rec_rt_host TEXT [default: NULL]
+  src VARCHAR(15) [default: NULL]
+  src_host TEXT [default: NULL]
+  src_rt VARCHAR(15) [default: NULL]
+  src_rt_host TEXT [default: NULL]
+  subopt_too_long TEXT [default: NULL]
+  tos "tinyint unsigned" [default: 0]
+  tos_cost tinyint(1) [default: 0]
+  tos_delay tinyint(1) [default: 0]
+  tos_precedence "tinyint unsigned" [default: 0]
+  tos_reliability tinyint(1) [default: 0]
+  tos_throughput tinyint(1) [default: 0]
+  ttl "tinyint unsigned" [default: 0]
+  ttl_lncb TEXT [default: NULL]
+  ttl_too_small TEXT [default: NULL]
+  version "tinyint unsigned" [default: 0]
+  
+ 
+  
+}
+
+
+Table arp {
+  id integer [pk, ref: - capture.id]
+  dst_atm_num_e164 TEXT [default: NULL]
+  dst_atm_num_nsap blob [default: NULL]
+  dst_atm_subaddr blob [default: NULL]
+  dst_drarp_error_status "smallint unsigned" [default: 0]
+  dst_hlen "tinyint unsigned" [default: 0]
+  dst_htype tinyint(1) [default: 0]
+  dst_hw blob [default: NULL]
+  dst_hw_ax25 blob [default: NULL]
+  dst_hw_mac TEXT [default: NULL]
+  dst_pln "tinyint unsigned" [default: 0]
+  dst_proto blob [default: NULL]
+  dst_proto_ipv4 VARCHAR(15) [default: NULL]
+  dst_slen "tinyint unsigned" [default: 0]
+  dst_stype tinyint(1) [default: 0]
+  dup_addr_detected TEXT [default: NULL]
+  dup_addr_frame integer [note: 'references earlier frame number', default: -1]  
+  hw_size "tinyint unsigned" [default: 0]
+  hw_type "smallint unsigned" [default: 0]
+  is_announcement tinyint(1) [default: 0]
+  isgratuitous tinyint(1) [default: 0]
+  isprobe tinyint(1) [default: 0]
+  opcode "smallint unsigned" [default: 0]
+  packet_storm_detected TEXT [default: NULL]
+  proto_size "tinyint unsigned" [default: 0]
+  proto_type "smallint unsigned" [default: 0]
+  seconds_since_dup_addr_frame "integer unsigned" [note: 'references earlier frame number', default: -1]  
+  src_atm_afi "tinyint unsigned" [default: 0]
+  src_atm_afi_unknown TEXT [default: NULL]
+  src_atm_data_country_code "smallint unsigned" [default: 0]
+  src_atm_data_country_code_group "smallint unsigned" [default: 0]
+  src_atm_e164_isdn blob [default: NULL]
+  src_atm_e164_isdn_group blob [default: NULL]
+  src_atm_end_sys_identifier blob [default: NULL]
+  src_atm_high_order_dsp blob [default: NULL]
+  src_atm_intl_code_designator "smallint unsigned" [default: 0]
+  src_atm_intl_code_designator_group "smallint unsigned" [default: 0]
+  src_atm_num_e164 TEXT [default: NULL]
+  src_atm_num_nsap blob [default: NULL]
+  src_atm_rest_of_addr blob [default: NULL]
+  src_atm_selector "tinyint unsigned" [default: 0]
+  src_atm_subaddr blob [default: NULL]
+  src_hlen "smallint unsigned" [default: 0]
+  src_htype tinyint(1) [default: 0]
+  src_hw blob [default: NULL]
+  src_hw_ax25 blob [default: NULL]
+  src_hw_mac TEXT [default: NULL]
+  src_pln "tinyint unsigned" [default: 0]
+  src_proto blob [default: NULL]
+  src_proto_ipv4 VARCHAR(15) [default: NULL]
+  src_slen "tinyint unsigned" [default: 0]
+  src_stype tinyint(1) [default: 0]
+}
+
+Table rarp {id integer [pk]
+} // Placeholder
+
+Table ppp {id integer [pk]
+} // Placeholder
+
+Table ipv6 {id integer [pk]
+} // Placeholder
+
+Table icmp {id integer [pk]
+} // Placeholder
+
+Table icmpv6 {id integer [pk]
+} // Placeholder
+
+Table igmp {id integer [pk]
+} // Placeholder
+
+Table bgp {id integer [pk]
+} // Placeholder
+
+Table ospf {id integer [pk]
+} // Placeholder
+
+Table rip {id integer [pk]
+} // Placeholder
+
+Table ripng {id integer [pk]
+} // Placeholder
+
+Table dsr {id integer [pk]
+} // Placeholder
+
+Table ah {id integer [pk]
+} // Placeholder
+
+Table esp {id integer [pk]
+} // Placeholder
+
+Table dccp {id integer [pk]
+} // Placeholder
+
+Table sctp {id integer [pk]
+} // Placeholder
+
+Table udp {
+  id integer [pk, ref: - capture.id]
+  checksum "smallint unsigned" [default: 0]
+  checksum_bad text [default: NULL]
+  checksum_status "tinyint unsigned" [default: 0]
+  checksum_zero text [default: NULL]
+  checksum_bad_bool tinyint(1) [default: 0]
+  checksum_bad_expert text [default: NULL]
+  checksum_calculated "smallint unsigned" [default: 0]
+  checksum_coverage_expert text [default: NULL]
+  checksum_good tinyint(1) [default: 0]
+  dstport "smallint unsigned" [default: 0]
+  length "smallint unsigned" [default: 0]
+  length_bad text [default: NULL]
+  length_bad_zero text [default: NULL]
+  payload longblob [default: NULL]
+  pdu_size "integer unsigned" [default: 0]
+  port "smallint unsigned" [default: 0]
+  possible_traceroute text [default: NULL]
+  proc_dstcmd text [default: NULL]
+  proc_dstpid "integer unsigned" [default: 0]
+  proc_dstuid "integer unsigned" [default: 0]
+  proc_dstuname text [default: NULL]
+  proc_srccmd text [default: NULL]
+  proc_srcpid "integer unsigned" [default: 0]
+  proc_srcuid "integer unsigned" [default: 0]
+  proc_srcuname text [default: NULL]
+  srcport "smallint unsigned" [default: 0]
+  stream "integer unsigned" [default: 0]
+  time_delta double [default: 0]
+  time_relative double [default: 0]
+  udplite_checksum_coverage_bad text [default: NULL]
+}
+
+Table udplite {id integer [pk]
+} // Placeholder
+
+Table tcp {id integer [pk]
+} // Placeholder
+
+Table portreference {id integer [pk]
+} // Placeholder
+
+Table rtp {id integer [pk]
+} // Placeholder
+
+Table rtcp {id integer [pk]
+} // Placeholder
+
+Table netbios {id integer [pk]
+} // Placeholder
+
+Table netdump {id integer [pk]
+} // Placeholder
+
+Table oncrpc {id integer [pk]
+} // Placeholder
+
+Table dcerpc {id integer [pk]
+} // Placeholder
+
+Table http {id integer [pk]
+} // Placeholder
+
+Table smtp {id integer [pk]
+} // Placeholder
+
+Table ancp {id integer [pk]
+} // Placeholder
+
+Table bootp {id integer [pk]
+} // Placeholder
+
+Table dhcp {id integer [pk]
+} // Placeholder
+
+Table dns {id integer [pk]
+} // Placeholder
+
+Table ftp {id integer [pk]
+} // Placeholder
+
+Table imap {id integer [pk]
+} // Placeholder
+
+Table iwarpddp {id integer [pk]
+} // Placeholder
+
+Table iwarpmpa {id integer [pk]
+} // Placeholder
+
+Table iwarprdmap {id integer [pk]
+} // Placeholder
+
+Table nntp {id integer [pk]
+} // Placeholder
+
+Table ntp {id integer [pk]
+} // Placeholder
+
+Table pana {id integer [pk]
+} // Placeholder
+
+Table pop {id integer [pk]
+} // Placeholder
+
+Table radius {id integer [pk]
+} // Placeholder
+
+Table rlogin {id integer [pk]
+} // Placeholder
+
+Table rsip {id integer [pk]
+} // Placeholder
+
+Table ssh {id integer [pk]
+} // Placeholder
+
+Table snmp {id integer [pk]
+} // Placeholder
+
+Table telnet {id integer [pk]
+} // Placeholder
+
+Table tftp {id integer [pk]
+} // Placeholder
+
+Table sasp {id integer [pk]
+} // Placeholder
+
+
+
+Tablegroup layers {
+  frame
+  eth
+  
+  // Link Layer
+  arp
+  rarp
+  
+  // Link Layer Serial line
+  ppp
+  //ipv // IP in every packet
+  
+  // Network Layer
+  ip
+  ipv6
+  icmp
+  icmpv6
+  igmp
+  
+  
+  // Network layer routing
+  bgp
+  ospf
+  rip
+  ripng
+  dsr
+  
+  // Network layer (ipsec)
+  ah
+  esp
+  
+  // Transport layer
+  dccp
+  sctp
+  udp
+  udplite
+  tcp
+  portreference
+  
+  // UDP Transport layer
+  rtp
+  rtcp
+  
+  // Session Layer
+  netbios
+  netdump
+  oncrpc
+  dcerpc
+  http
+  smtp
+  
+  // Application Layer
+  ancp
+  bootp
+  dhcp
+  dns
+  ftp
+  imap
+  iwarpddp
+  iwarpmpa
+  iwarprdmap
+  nntp
+  ntp
+  pana
+  pop
+  radius
+  rlogin
+  rsip
+  ssh
+  snmp
+  telnet
+  tftp
+  sasp
+}
+

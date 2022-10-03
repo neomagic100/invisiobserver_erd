@@ -1,0 +1,40 @@
+project invisiobserver {
+  database_type: 'mariadb'
+  Note: '''
+    # Database to manage user logins
+    ** markdown **
+  '''
+}
+
+Table users {
+  id int [pk, increment]
+  user_name TINYTEXT [not null, unique]
+  password TINYTEXT [not null]
+  email TINYTEXT [unique]
+  name TINYTEXT
+  phone TINYTEXT
+  created_at DATETIME [default: 'NOW()']
+  last_accessed_at DATETIME [default: 'NOW()',
+  note: 'Create trigger or backend handle
+  last accessed']
+}
+
+Table database_users {
+  id int [pk]
+  user_name TINYTEXT [not null, unique]
+  password TINYTEXT [not null]
+  role db_roles [default:'other_user']
+  note: "Set trigger to default user name
+    and password as user's"
+}
+
+Table user_is_dbuser {
+  user_id int [ref: - users.id]
+  db_id int [ref: - database_users.id]
+}
+
+enum db_roles{
+  developer
+  admin
+  other_user
+}
